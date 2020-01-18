@@ -9,4 +9,4 @@ const BLOCK_HEIGHT = 83;
  * The default rate at which enemies spawn in number of enemies per second.
  * @type {number}
  */
-const ENEMY_SPAWN_RATE = 0.5;
+const ENEMY_SPAWN_RATE = 2;
