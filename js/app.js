@@ -148,6 +148,7 @@ class Player {
  */
 function handleGameWon() {
     player.reset();
+    allEnemies = [];
 }
 
 /**
@@ -211,5 +212,5 @@ document.addEventListener('keyup', e => {
 });
 
 const player = new Player('images/char-boy.png');
-const allEnemies = [];
+let allEnemies = [];
 spawnEnemiesLoop(ENEMY_SPAWN_RATE);
