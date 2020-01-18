@@ -3,16 +3,19 @@
  */
 class Enemy {
     #sprite; // The URL of the image that will be used to draw the character
+    #speed; // The speed of the enemy in pixels per second
     #x; // The position from the left end of the canvas in number of pixels starting from 0
     #yBlock; // The position from the top end of the canvas in number of blocks starting from 0
 
     /**
      * Creates a Enemy object.
      * @param enemyRow {number} - The row number relative to the first enemy row (concrete row) on which this enemy will appear. Starts from 0.
+     * @param speed {number} - The speed of the enemy in pixels per second.
      */
-    constructor(enemyRow) {
+    constructor(enemyRow, speed) {
         this.#sprite = 'images/enemy-bug.png';
-        this.#x = 0;
+        this.#speed = speed;
+        this.#x = -BLOCK_WIDTH;
         this.#yBlock = 1 + enemyRow;
     }
 
@@ -32,10 +35,10 @@ class Enemy {
 
     /**
      * Updates the state of the enemy character on every game tick.
-     * @param dt {number} - The time delta since the previous update.
+     * @param dt {number} - The time delta since the previous update in seconds.
      */
     update(dt) {
-
+        this.#x += this.#speed * dt;
     }
 
     /**
@@ -80,7 +83,7 @@ class Player {
 
     /**
      * Updates the state of the player character on every game tick.
-     * @param dt {number} - The time delta since the previous update.
+     * @param dt {number} - The time delta since the previous update in seconds.
      */
     update(dt) {
         if (this.#yBlock === 0) {
@@ -137,9 +140,6 @@ class Player {
     }
 }
 
-const allEnemies = [new Enemy(1)];
-const player = new Player('images/char-boy.png');
-
 /**
  * Resets the game after it is won.
  */
@@ -177,3 +177,6 @@ document.addEventListener('keyup', e => {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+const player = new Player('images/char-boy.png');
+const allEnemies = [new Enemy(1, 50)];
