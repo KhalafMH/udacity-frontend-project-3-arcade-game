@@ -43,13 +43,29 @@ class Player {
         this.#y = 4;
     }
 
-    update() {}
+    /**
+     * Updates the state of the player character on every game tick.
+     * @param dt {number} - The time delta since the previous update.
+     */
+    update(dt) {
+        if (this.#y === 0) {
+            handleGameWon();
+        }
+    }
 
     /**
      * Renders the player character on the canvas.
      */
     render() {
         ctx.drawImage(Resources.get(this.#sprite), this.#x * BLOCK_WIDTH, this.#y * BLOCK_HEIGHT - (BLOCK_HEIGHT / 2));
+    }
+
+    /**
+     * Resets the player to the starting position.
+     */
+    reset() {
+        this.#x = 2;
+        this.#y = 4;
     }
 
     /**
@@ -92,6 +108,13 @@ class Player {
 
 const allEnemies = [];
 const player = new Player('images/char-boy.png');
+
+/**
+ * Resets the game after it is won.
+ */
+function handleGameWon() {
+    player.reset();
+}
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
