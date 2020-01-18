@@ -17,6 +17,20 @@ class Enemy {
     }
 
     /**
+     * @returns {number} - The position from the left end of the canvas in number of blocks starting from 0.
+     */
+    get xBlock() {
+        return Math.floor((this.#x + BLOCK_WIDTH / 2) / BLOCK_WIDTH);
+    }
+
+    /**
+     * @returns {number} - The position from the top end of the canvas in number of blocks starting from 0.
+     */
+    get yBlock() {
+        return this.#yBlock;
+    }
+
+    /**
      * Updates the state of the enemy character on every game tick.
      * @param dt {number} - The time delta since the previous update.
      */
@@ -48,6 +62,20 @@ class Player {
         this.#sprite = sprite;
         this.#xBlock = 2;
         this.#yBlock = 4;
+    }
+
+    /**
+     * @returns {number} - The position from the left end of the canvas in number of blocks starting from 0.
+     */
+    get xBlock() {
+        return this.#xBlock;
+    }
+
+    /**
+     * @returns {number} - The position from the top end of the canvas in number of blocks starting from 0.
+     */
+    get yBlock() {
+        return this.#yBlock;
     }
 
     /**
@@ -119,9 +147,27 @@ function handleGameWon() {
     player.reset();
 }
 
+/**
+ * Resets the game after it is lost.
+ */
+function handleGameLost() {
+    player.reset();
+}
+
+/**
+ * Checks if there is a collision present in the current state of the game and resets the game if one is detected.
+ */
+function checkCollisions() {
+    for (const enemy of allEnemies) {
+        if (enemy.xBlock === player.xBlock && enemy.yBlock === player.yBlock) {
+            handleGameLost();
+        }
+    }
+}
+
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
-document.addEventListener('keyup', function(e) {
+document.addEventListener('keyup', e => {
     var allowedKeys = {
         37: 'left',
         38: 'up',
