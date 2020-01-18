@@ -34,11 +34,14 @@ class Enemy {
     }
 
     /**
-     * Updates the state of the enemy character on every game tick.
+     * Updates the position of the enemy character on every game tick and deletes it when it goes out of view.
      * @param dt {number} - The time delta since the previous update in seconds.
      */
     update(dt) {
         this.#x += this.#speed * dt;
+        if (this.#x > CANVAS_WIDTH) {
+            deleteEnemy(this);
+        }
     }
 
     /**
@@ -165,6 +168,35 @@ function checkCollisions() {
     }
 }
 
+/**
+ * Spawns a new enemy.
+ */
+function spawnEnemy() {
+    allEnemies.push(new Enemy(Math.floor(Math.random() * 3), 50 + Math.random() * 250));
+}
+
+/**
+ * Deletes an enemy from the game.
+ * @param enemy {Enemy} - The enemy to delete.
+ */
+function deleteEnemy(enemy) {
+    allEnemies.splice(allEnemies.indexOf(enemy), 1);
+}
+
+/**
+ * Start a loop that spawns enemies at a constant rate.
+ * @param spawnRate {number} - The rate at which enemies are spawned in number of enemies per second.
+ */
+function spawnEnemiesLoop(spawnRate) {
+    const spawnTime = 1000 / spawnRate;
+    (function loop() {
+        spawnEnemy();
+        setTimeout(() => {
+            loop();
+        }, spawnTime)
+    }())
+}
+
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keyup', e => {
@@ -179,4 +211,5 @@ document.addEventListener('keyup', e => {
 });
 
 const player = new Player('images/char-boy.png');
-const allEnemies = [new Enemy(1, 50)];
+const allEnemies = [];
+spawnEnemiesLoop(ENEMY_SPAWN_RATE);
