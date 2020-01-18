@@ -52,7 +52,38 @@ class Player {
         ctx.drawImage(Resources.get(this.#sprite), this.#x * BLOCK_WIDTH, this.#y * BLOCK_HEIGHT - (BLOCK_HEIGHT / 2));
     }
 
-    handleInput() {}
+    /**
+     * Updates the character position in response to a keyboard input
+     * @param direction {string} - The direction to move the character. Must be one of: 'up', 'down', 'left', 'right'.
+     */
+    handleInput(direction) {
+        if (!direction) return;
+
+        switch (direction) {
+            case 'up':
+                if (this.#y !== 0) {
+                    this.#y--;
+                }
+                break;
+            case 'down':
+                if (this.#y !== NUM_ROWS - 1) {
+                    this.#y++;
+                }
+                break;
+            case 'left':
+                if (this.#x !== 0) {
+                    this.#x--;
+                }
+                break;
+            case 'right':
+                if (this.#x !== NUM_COLS - 1) {
+                    this.#x++;
+                }
+                break;
+            default:
+                throw new Error(`Unknown direction passed to handleInput(): ${direction}`)
+        }
+    }
 }
 
 // Now instantiate your objects.
