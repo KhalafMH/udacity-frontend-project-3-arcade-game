@@ -25,11 +25,33 @@ Enemy.prototype.render = function() {
 // This class requires an update(), render() and
 // a handleInput() method.
 
+/**
+ * The player character.
+ */
 class Player {
-    constructor() {}
+    #sprite; // The URL of the image that will be used to draw the character
+    #x; // The position from the left end of the canvas in number of blocks starting from 0
+    #y; // The position from the top end of the canvas in number of blocks starting from 0
+
+    /**
+     * Creates a Player object.
+     * @param sprite {string} - The URL of the image that will be used to draw the character
+     */
+    constructor(sprite) {
+        this.#sprite = sprite;
+        this.#x = 2;
+        this.#y = 4;
+    }
 
     update() {}
-    render() {}
+
+    /**
+     * Renders the player character on the canvas.
+     */
+    render() {
+        ctx.drawImage(Resources.get(this.#sprite), this.#x * BLOCK_WIDTH, this.#y * BLOCK_HEIGHT - (BLOCK_HEIGHT / 2));
+    }
+
     handleInput() {}
 }
 
@@ -38,7 +60,7 @@ class Player {
 // Place the player object in a variable called player
 
 const allEnemies = [];
-const player = new Player();
+const player = new Player('images/char-boy.png');
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
