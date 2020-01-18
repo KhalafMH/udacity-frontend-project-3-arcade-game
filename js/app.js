@@ -1,37 +1,44 @@
-// Enemies our player must avoid
-var Enemy = function() {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
+/**
+ * Enemies our player must avoid
+ */
+class Enemy {
+    #sprite; // The URL of the image that will be used to draw the character
+    #x; // The position from the left end of the canvas in number of pixels starting from 0
+    #yBlock; // The position from the top end of the canvas in number of blocks starting from 0
 
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
-};
+    /**
+     * Creates a Enemy object.
+     * @param enemyRow {number} - The row number relative to the first enemy row (concrete row) on which this enemy will appear. Starts from 0.
+     */
+    constructor(enemyRow) {
+        this.#sprite = 'images/enemy-bug.png';
+        this.#x = 0;
+        this.#yBlock = 1 + enemyRow;
+    }
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
-Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-};
+    /**
+     * Updates the state of the enemy character on every game tick.
+     * @param dt {number} - The time delta since the previous update.
+     */
+    update(dt) {
 
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
+    }
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
+    /**
+     * Renders the enemy character on the canvas.
+     */
+    render() {
+        ctx.drawImage(Resources.get(this.#sprite), this.#x, this.#yBlock * BLOCK_HEIGHT - (BLOCK_HEIGHT / 2));
+    }
+}
 
 /**
  * The player character.
  */
 class Player {
     #sprite; // The URL of the image that will be used to draw the character
-    #x; // The position from the left end of the canvas in number of blocks starting from 0
-    #y; // The position from the top end of the canvas in number of blocks starting from 0
+    #xBlock; // The position from the left end of the canvas in number of blocks starting from 0
+    #yBlock; // The position from the top end of the canvas in number of blocks starting from 0
 
     /**
      * Creates a Player object.
@@ -39,8 +46,8 @@ class Player {
      */
     constructor(sprite) {
         this.#sprite = sprite;
-        this.#x = 2;
-        this.#y = 4;
+        this.#xBlock = 2;
+        this.#yBlock = 4;
     }
 
     /**
@@ -48,7 +55,7 @@ class Player {
      * @param dt {number} - The time delta since the previous update.
      */
     update(dt) {
-        if (this.#y === 0) {
+        if (this.#yBlock === 0) {
             handleGameWon();
         }
     }
@@ -57,15 +64,15 @@ class Player {
      * Renders the player character on the canvas.
      */
     render() {
-        ctx.drawImage(Resources.get(this.#sprite), this.#x * BLOCK_WIDTH, this.#y * BLOCK_HEIGHT - (BLOCK_HEIGHT / 2));
+        ctx.drawImage(Resources.get(this.#sprite), this.#xBlock * BLOCK_WIDTH, this.#yBlock * BLOCK_HEIGHT - (BLOCK_HEIGHT / 2));
     }
 
     /**
      * Resets the player to the starting position.
      */
     reset() {
-        this.#x = 2;
-        this.#y = 4;
+        this.#xBlock = 2;
+        this.#yBlock = 4;
     }
 
     /**
@@ -77,23 +84,23 @@ class Player {
 
         switch (direction) {
             case 'up':
-                if (this.#y !== 0) {
-                    this.#y--;
+                if (this.#yBlock !== 0) {
+                    this.#yBlock--;
                 }
                 break;
             case 'down':
-                if (this.#y !== NUM_ROWS - 1) {
-                    this.#y++;
+                if (this.#yBlock !== NUM_ROWS - 1) {
+                    this.#yBlock++;
                 }
                 break;
             case 'left':
-                if (this.#x !== 0) {
-                    this.#x--;
+                if (this.#xBlock !== 0) {
+                    this.#xBlock--;
                 }
                 break;
             case 'right':
-                if (this.#x !== NUM_COLS - 1) {
-                    this.#x++;
+                if (this.#xBlock !== NUM_COLS - 1) {
+                    this.#xBlock++;
                 }
                 break;
             default:
@@ -102,11 +109,7 @@ class Player {
     }
 }
 
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
-
-const allEnemies = [];
+const allEnemies = [new Enemy(1)];
 const player = new Player('images/char-boy.png');
 
 /**
