@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Enemies our player must avoid
  */
@@ -15,22 +17,19 @@ class Enemy {
     constructor(enemyRow, speed) {
         this.#sprite = 'images/enemy-bug.png';
         this.#speed = speed;
-        this.#x = -BLOCK_WIDTH;
+        this.#x = -BLOCK_WIDTH; // start outside canvas
         this.#yBlock = 1 + enemyRow;
     }
 
     /**
-     * @returns {number} - The position from the left end of the canvas in number of blocks starting from 0.
+     * @returns {CollisionArea} - The collision area that is occupied by this character in pixels.
      */
-    get xBlock() {
-        return Math.floor((this.#x + BLOCK_WIDTH / 2) / BLOCK_WIDTH);
-    }
-
-    /**
-     * @returns {number} - The position from the top end of the canvas in number of blocks starting from 0.
-     */
-    get yBlock() {
-        return this.#yBlock;
+    get collisionArea() {
+        const startX = this.#x;
+        const endX = this.#x + BLOCK_WIDTH;
+        const startY = this.#yBlock * BLOCK_HEIGHT;
+        const endY = (this.#yBlock + 1) * BLOCK_HEIGHT - 1;
+        return new CollisionArea(startX, endX, startY, endY);
     }
 
     /**
@@ -71,17 +70,14 @@ class Player {
     }
 
     /**
-     * @returns {number} - The position from the left end of the canvas in number of blocks starting from 0.
+     * @returns {CollisionArea} - The collision area that is occupied by this character in pixels.
      */
-    get xBlock() {
-        return this.#xBlock;
-    }
-
-    /**
-     * @returns {number} - The position from the top end of the canvas in number of blocks starting from 0.
-     */
-    get yBlock() {
-        return this.#yBlock;
+    get collisionArea() {
+        const startX = this.#xBlock * BLOCK_WIDTH + (BLOCK_WIDTH / 4);
+        const endX = (this.#xBlock + 1) * BLOCK_WIDTH - (BLOCK_WIDTH / 4);
+        const startY = this.#yBlock * BLOCK_HEIGHT;
+        const endY = (this.#yBlock + 1) * BLOCK_HEIGHT - 1;
+        return new CollisionArea(startX, endX, startY, endY);
     }
 
     /**
@@ -144,6 +140,137 @@ class Player {
 }
 
 /**
+ * Represents an inclusive range of numbers.
+ */
+class Range {
+    #start;
+    #end;
+
+    /**
+     * Creates a new Range object.
+     * @param start {number} - The inclusive start of the range.
+     * @param end {number} - The inclusive end of the range.
+     */
+    constructor(start, end) {
+        this.#start = start;
+        this.#end = end;
+    }
+
+    /**
+     * @returns {number} - The inclusive start of the range.
+     */
+    get start() {
+        return this.#start;
+    }
+
+    /**
+     * @returns {number} - The inclusive end of the range.
+     */
+    get end() {
+        return this.#end;
+    }
+
+    /**
+     * Checks if this range overlaps with the given range.
+     * @param range {number | Range} - The range to check against.
+     * @returns {boolean} - True if the given range overlaps with this range, false otherwise.
+     */
+    overlaps(range) {
+        if (typeof range === "number") {
+            return this.start <= range && this.end >= range;
+        } else if (range instanceof Range) {
+            return (this.start <= range.start && this.end >= range.start)
+                || (this.start <= range.end && this.end >= range.end);
+        }
+    }
+
+    /**
+     * Checks if the two given ranges are overlapping.
+     * @param range1 {Range} - The first range.
+     * @param range2 {Range} - The second range.
+     * @returns {boolean} - True if the two ranges are overlapping, false otherwise.
+     */
+    static overlaps(range1, range2) {
+        return range1.overlaps(range2);
+    }
+}
+
+/**
+ * A rectangular collision area.
+ */
+class CollisionArea {
+    startX;
+    endX;
+    startY;
+    endY;
+
+    /**
+     * Creates a new `CollisionArea`.
+     * @param startX {number} - The inclusive starting point on the X axis.
+     * @param endX {number} - The inclusive ending point on the X axis.
+     * @param startY {number} - The inclusive starting point on the Y axis.
+     * @param endY {number} - The inclusive ending point on the Y axis.
+     */
+    constructor(startX, endX, startY, endY) {
+        this.startX = startX;
+        this.endX = endX;
+        this.startY = startY;
+        this.endY = endY;
+    }
+
+    /**
+     * @returns {number} - The inclusive starting point on the X axis.
+     */
+    get startX() {
+        return this.startX;
+    }
+
+    /**
+     * @returns {number} - The inclusive ending point on the X axis.
+     */
+    get endX() {
+        return this.endX;
+    }
+
+    /**
+     * @returns {number} - The inclusive starting point on the Y axis.
+     */
+    get startY() {
+        return this.startY;
+    }
+
+    /**
+     * @returns {number} - The inclusive ending point on the Y axis.
+     */
+    get endY() {
+        return this.endY;
+    }
+
+    /**
+     * @returns {Range} - The occupied range on the X axis.
+     */
+    get xRange() {
+        return new Range(this.startX, this.endX);
+    }
+
+    /**
+     * @returns {Range} - The occupied range on the Y axis.
+     */
+    get yRange() {
+        return new Range(this.startY, this.endY);
+    }
+
+    /**
+     * Checks if this `CollisionRange` overlaps the argument range.
+     * @param collisionArea {CollisionArea}
+     */
+    collidesWith(collisionArea) {
+        return Range.overlaps(this.xRange,collisionArea.xRange)
+            && Range.overlaps(this.yRange,collisionArea.yRange);
+    }
+}
+
+/**
  * Resets the game after it is won.
  */
 function handleGameWon() {
@@ -163,7 +290,7 @@ function handleGameLost() {
  */
 function checkCollisions() {
     for (const enemy of allEnemies) {
-        if (enemy.xBlock === player.xBlock && enemy.yBlock === player.yBlock) {
+        if (enemy.collisionArea.collidesWith(player.collisionArea)) {
             handleGameLost();
         }
     }
